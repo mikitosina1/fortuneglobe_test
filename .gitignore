@@ -14,8 +14,6 @@
 /.env.test
 /.idea
 /.editorconfig
-/composer.lock
-/symfony.lock
 
 ###> phpunit/phpunit ###
 /phpunit.xml

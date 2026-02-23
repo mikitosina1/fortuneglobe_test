@@ -23,7 +23,7 @@ final class PosSummaryController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
-    #[Route('/api/pos/summary', name: 'api_pos_summary')]
+    #[Route('/api/pos/summary', name: 'api_pos_summary', methods: ['GET'])]
     public function summary(Request $request): JsonResponse
     {
         try {
@@ -31,6 +31,12 @@ final class PosSummaryController extends AbstractController
                 $request->query->get('from'),
                 $request->query->get('to'),
             );
+            if ($date['from'] !== null && $date['to'] !== null && $date['from'] > $date['to']) {
+                return $this->json(
+                    ['message' => 'Start date must be not greater than end date'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
             return $this->json($this->posSummaryService->getSummaryByPeriod($date['from'], $date['to']));
 
         } catch (Exception $e) {
