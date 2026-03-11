@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Dto\PosSummaryDto;
 use App\Repository\PointOfSaleRepository;
 use DateMalformedStringException;
 use DateTimeImmutable;
@@ -24,7 +25,7 @@ class PosSummaryService
     /**
      * @param DateTimeImmutable|null $from
      * @param DateTimeImmutable|null $to
-     * @return array
+     * @return PosSummaryDto[]
      * @throws DateMalformedStringException
      */
     public function getSummaryByPeriod(?DateTimeImmutable $from, ?DateTimeImmutable $to): array
@@ -34,7 +35,19 @@ class PosSummaryService
             $from = $now->modify('first day of this month')->setTime(0, 0, 0);
             $to = $now->modify('last day of this month')->setTime(23, 59, 59);
         }
+        $rows =  $this->repository->findSummaryByPeriod($from, $to);
+        $result = [];
 
-        return $this->repository->findSummaryByPeriod($from, $to);
+        foreach ($rows as $row) {
+            $result[] = new PosSummaryDto(
+                (int) $row["id"],
+                (string) $row["name"],
+                (int) $row["orderCount"],
+                (float) $row["totalRevenue"],
+                (float) $row["averageOrderValue"]
+            );
+        }
+
+        return $result;
     }
 }
